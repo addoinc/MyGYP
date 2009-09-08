@@ -1,0 +1,20 @@
+## Interface: 30200
+## Title: Gnomish Yellow Pages
+## Notes: Captures chatframe Tradeskill Links for later reference in an easy to read format
+## Author: LilSparky
+## SavedVariables: YPData, Config
+## Version: r51
+## LoadManagers: AddonLoader
+## X-LoadOn-Always: delayed
+## X-Revision: $Rev: 52 $
+## X-Curse-Packaged-Version: r58beta
+## X-Curse-Project-Name: Gnomish Yellow Pages
+## X-Curse-Project-ID: gnomishyellowpages
+## X-Curse-Repository-ID: wow/gnomishyellowpages/mainline
+
+
+LibStub\LibStub.lua
+lib-st\Core.lua
+
+GYPSpellData.lua
+GnomishYellowPages.lua

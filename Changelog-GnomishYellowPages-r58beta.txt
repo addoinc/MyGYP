@@ -1,0 +1,56 @@
+------------------------------------------------------------------------
+r59 | lilsparky | 2009-08-20 02:33:57 +0000 (Thu, 20 Aug 2009) | 1 line
+Changed paths:
+   A /tags/r58beta (from /trunk:58)
+
+Tagging as r58beta
+------------------------------------------------------------------------
+r58 | lilsparky | 2009-08-20 01:37:02 +0000 (Thu, 20 Aug 2009) | 3 lines
+Changed paths:
+   M /trunk/GYPSpellData.lua
+   M /trunk/GnomishYellowPages.lua
+
+new spell data for latest patch
+packaged with latest lib-st which addresses some frame resizing issues
+
+------------------------------------------------------------------------
+r57 | lilsparky | 2009-08-17 06:27:24 +0000 (Mon, 17 Aug 2009) | 2 lines
+Changed paths:
+   M /trunk/GnomishYellowPages.lua
+
+fixed scroll bar problems after resize
+fixed highlighting of selected rows
+------------------------------------------------------------------------
+r55 | lilsparky | 2009-08-15 18:01:08 +0000 (Sat, 15 Aug 2009) | 1 line
+Changed paths:
+   M /trunk/.pkgmeta
+
+trying to figure out .pkgmeta functionality... 
+------------------------------------------------------------------------
+r53 | lilsparky | 2009-08-15 17:27:20 +0000 (Sat, 15 Aug 2009) | 1 line
+Changed paths:
+   M /trunk/.pkgmeta
+   A /trunk/LibStub
+   A /trunk/LibStub/LibStub.lua
+   A /trunk/LibStub/LibStub.toc
+
+okay, adjusting lib usage (sue me)
+------------------------------------------------------------------------
+r52 | lilsparky | 2009-08-15 17:19:15 +0000 (Sat, 15 Aug 2009) | 2 lines
+Changed paths:
+   A /trunk/.pkgmeta
+   M /trunk/GnomishYellowPages.toc
+
+updated toc
+forgot to include .pkgmeta
+------------------------------------------------------------------------
+r50 | lilsparky | 2009-08-15 05:57:47 +0000 (Sat, 15 Aug 2009) | 3 lines
+Changed paths:
+   M /trunk/GYPSpellData.lua
+   M /trunk/GnomishYellowPages.lua
+   M /trunk/GnomishYellowPages.toc
+
+updated with 3.2 spell data
+fixed problem with bad links stopping all recording
+
+------------------------------------------------------------------------
