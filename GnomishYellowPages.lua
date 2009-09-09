@@ -1457,43 +1457,47 @@ do
 		end
 	end
 
+	local function BuildSearchWidget()
+		local search_widget = CreateFrame("Frame", nil, frame)
+		search_widget:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", 0, -65)
+		search_widget:SetPoint("TOPLEFT", frame, "TOPRIGHT", -200, -30)
+
+		-- Create search box
+		local srchbx = CreateFrame("EditBox", nil, search_widget)
+		frame.srchbx = srchbx
+		srchbx:SetFontObject('GameFontHighlightSmall')
+		srchbx:SetText("Search")
+		srchbx:SetWidth(70)
+		srchbx:SetHeight(13)
+		srchbx:SetAutoFocus(false)
+		srchbx:SetPoint("TOPLEFT", 0, 0)
+
+		local left = srchbx:CreateTexture(nil, "BACKGROUND")
+		left:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Left")
+		left:SetTexCoord(0, 100 / 256, 0, 1)
+		left:SetWidth(70)
+		left:SetHeight(32)
+		left:SetPoint("LEFT", srchbx, "LEFT", -10, 0)
+
+		local right = srchbx:CreateTexture(nil, "BACKGROUND")
+		right:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Right")
+		right:SetTexCoord(156/256, 1, 0, 1)
+		right:SetWidth(70)
+		right:SetHeight(32)
+		right:SetPoint("RIGHT", srchbx, "RIGHT", 10, 0)
+
+		-- create the search button
+		local srchbtn = CreateFrame("Button", nil, search_widget, "UIPanelButtonTemplate")
+		srchbtn:SetWidth(60)
+		srchbtn:SetHeight(25)
+		srchbtn:SetText("Search")
+		srchbtn:SetPoint("TOPLEFT", 90, 7)
+	end
+
 	local function BuildScrollingTable()
 --		if not false then return end
-
-
 		if not st then
-			-- ADDED BY GAUTAM
-			-- Create search box
-			local srchbx = CreateFrame("EditBox", nil, frame)
-			frame.srchbx = srchbx
-			srchbx:SetFontObject('GameFontHighlightSmall')
-			srchbx:SetWidth(60)
-			srchbx:SetHeight(13)
-			srchbx:SetAutoFocus(true)
-			srchbx:SetPoint("TOPRIGHT", -105, -30)
-
-			local left = srchbx:CreateTexture(nil, "BACKGROUND")
-			left:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Left")
-			left:SetTexCoord(0, 100 / 256, 0, 1)
-			left:SetWidth(60)
-			left:SetHeight(32)
-			left:SetPoint("LEFT", srchbx, "LEFT", -10, 0)
-
-			local right = srchbx:CreateTexture(nil, "BACKGROUND")
-			right:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Right")
-			right:SetTexCoord(156/256, 1, 0, 1)
-			right:SetWidth(60)
-			right:SetHeight(32)
-			right:SetPoint("RIGHT", srchbx, "RIGHT", 10, 0)
-
-			-- create the search button
-			local srchbtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-			srchbtn:SetWidth(60)
-			srchbtn:SetHeight(25)
-			srchbtn:SetText("Search")
-			srchbtn:SetPoint("TOPRIGHT", -35, -25)
-			-- ENDOF GAUTAM'S ADDITIONS
-
+			BuildSearchWidget()
 			local ScrollPaneBackdrop  = {
 				bgFile = "Interface\\AddOns\\GnomishYellowPages\\Art\\newFrameInsetBackground.tga",
 				edgeFile = "Interface\\AddOns\\GnomishYellowPages\\Art\\newFrameInsetBorder.tga",
