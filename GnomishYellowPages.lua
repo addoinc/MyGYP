@@ -1,5 +1,3 @@
-
-
 -- The Gnomish Yellow Pages
 -- let your stumpy little fingers do the walking
 
@@ -803,6 +801,7 @@ end
 
 do
 	local frame
+	local search_widget
 	local master = CreateFrame("Frame")
 
 	local function RegisterKeyFunction(frame, key, func)
@@ -903,8 +902,6 @@ do
 
 		tradeIDbyName[GetSpellInfo(aliases[1])] = aliases[1]
 	end
-
-
 
 	buildBasicTradeTable({ 2259,3101,3464,11611,28596,28677,28675,28672,51304 })					-- alchemy
 	buildBasicTradeTable({ 2018,3100,3538,9785,9788,9787,17039,17040,17041,29844,51300 })				-- bs
@@ -1121,7 +1118,6 @@ do
 			["sortnext"] = 3,
 			["onclick"] =	function(button, link)
 								local tradeString = string.match(link, "(trade:%d+:%d+:%d+:[0-9a-fA-F]+:[A-Za-z0-9+/]+)")
-
 								if IsShiftKeyDown() then
 									if (ChatFrameEditBox:IsVisible() or WIM_EditBoxInFocus ~= nil) then
 										ChatEdit_InsertLink(link)
@@ -1458,7 +1454,7 @@ do
 	end
 
 	local function BuildSearchWidget()
-		local search_widget = CreateFrame("Frame", nil, frame)
+		search_widget = CreateFrame("Frame", nil, frame)
 		search_widget:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", 0, -65)
 		search_widget:SetPoint("TOPLEFT", frame, "TOPRIGHT", -200, -30)
 
@@ -1471,6 +1467,18 @@ do
 		srchbx:SetHeight(13)
 		srchbx:SetAutoFocus(false)
 		srchbx:SetPoint("TOPLEFT", 0, 0)
+		srchbx:SetScript(
+			"OnEditFocusGained",
+			function(editbox)
+				editbox:SetText("")
+			end
+		)
+		srchbx:SetScript(
+			"OnEscapePressed",
+			function(editbox)
+				editbox:ClearFocus()
+			end
+		)
 
 		local left = srchbx:CreateTexture(nil, "BACKGROUND")
 		left:SetTexture("Interface\\ChatFrame\\UI-ChatInputBorder-Left")
@@ -1492,10 +1500,36 @@ do
 		srchbtn:SetHeight(25)
 		srchbtn:SetText("Search")
 		srchbtn:SetPoint("TOPLEFT", 90, 7)
+		srchbtn:SetScript(
+			"OnClick",
+			function(button)
+				param = srchbx:GetText()
+				linkRow = {}
+				st.data = {}
+				for trade, adList in pairs(YPData[serverKey]) do
+					for player, ad in pairs(adList) do
+						i, j = string.find(string.lower(ad.message), string.lower(param))
+						if( i ~= nil and j ~= nil ) then
+							AddToScrollingTable(trade,player, ad)
+						end
+					end
+				end
+				st:SortData()
+				ResizeMainWindow()
+			end
+		)
+		-- The following editbox event handler refers the button's onclick handler
+		-- hence has to placed after the button has been declared
+		srchbx:SetScript(
+			"OnEnterPressed",
+			function(editbox)
+				srchbtn:Click( "LeftButton", false )
+			end
+		)
 	end
 
 	local function BuildScrollingTable()
---		if not false then return end
+	--	if not false then return end
 		if not st then
 			BuildSearchWidget()
 			local ScrollPaneBackdrop  = {
@@ -1504,7 +1538,6 @@ do
 				tile = true, tileSize = 16, edgeSize = 16,
 				insets = { left = 3, right = 3, top = 3, bottom = 3 }
 			};
-
 
 			local rows = floor((frame:GetHeight() - 71-15) / 15)
 			local LibScrollingTable = LibStub("ScrollingTable")
@@ -1516,21 +1549,13 @@ do
 
 			st.LibraryRefresh = st.Refresh
 
-
---			SetBetterBackdrop(st.frame,ScrollPaneBackdrop);
---			st.frame:SetBackdropColor(1,1,1,1);
+			-- SetBetterBackdrop(st.frame,ScrollPaneBackdrop);
+			-- st.frame:SetBackdropColor(1,1,1,1);
 
 			st.frame:SetBackdrop(nil);
 
-
-
-
-
 			for i=1,#st.cols do 
 				local col = st.head.cols[i]
-
-
-
 				col.frame = CreateFrame("Frame", nil, st.frame)
 				SetBetterBackdrop(col.frame,ScrollPaneBackdrop)
 				col.frame:SetPoint("TOP", st.frame, "TOP", 0,0)
@@ -1547,12 +1572,9 @@ do
 
 			AdjustColumnWidths()
 
-
-
 			st.scrollframe:SetScript("OnHide", nil)
 			st.scrollframe:SetPoint("TOPLEFT", st.frame, "TOPLEFT", 0, -2)
 			st.scrollframe:SetPoint("BOTTOMRIGHT", st.frame, "BOTTOMRIGHT", -20, 2)
-
 
 			local scrolltrough = getglobal(st.frame:GetName().."ScrollTrough")
 			scrolltrough:SetWidth(17)
@@ -1564,16 +1586,13 @@ do
 			st.rows[1]:SetPoint("TOPLEFT", st.frame, "TOPLEFT", 0, -1);
 			st.rows[1]:SetPoint("TOPRIGHT", st.frame, "TOPRIGHT", -1, -1);
 
-
 			st.head:SetPoint("BOTTOMLEFT", st.frame, "TOPLEFT", 2, 2);
 			st.head:SetPoint("BOTTOMRIGHT", st.frame, "TOPRIGHT", 0, 2);
-
 
 			st.frame.noDataFrame = CreateFrame("Frame",nil,st.frame)
 			st.frame.noDataFrame:SetAllPoints(st.frame)
 			SetBetterBackdrop(st.frame.noDataFrame,ScrollPaneBackdrop);
 			st.frame.noDataFrame:Hide()
-
 
 			local text = st.frame.noDataFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
 			text:SetJustifyH("CENTER")
@@ -1583,11 +1602,9 @@ do
 
 			st.data = {}
 
-
 			st.Refresh = function(st)
 				st:LibraryRefresh()
-
-	--[[
+				--[[
 				for i=1, 5 do
 					if columnHeaders[i].divider then
 						if #st.filtered==0 then
@@ -1597,10 +1614,9 @@ do
 						end
 					end
 				end
-	]]
+				]]
 				for i=1,st.displayRows do
 					local row = i+(st.offset or 0)
-
 					local filteredRow = st.filtered[row]
 
 					if filteredRow and st.data[filteredRow] then
@@ -1623,7 +1639,7 @@ do
 
 			st:RegisterEvents({
 				["OnEvent"] =  function (rowFrame, cellFrame, data, cols, row, realrow, column, st, event, arg1, arg2, ...)
---	DEFAULT_CHAT_FRAME:AddMessage("EVENT "..tostring(event))
+					--DEFAULT_CHAT_FRAME:AddMessage("EVENT "..tostring(event))
 					if event == "MODIFIER_STATE_CHANGED" then
 						if arg1 == "LCTRL" or arg1 == "RCTRL" then
 							frame.keyCapture:EnableKeyboard(arg2==1)
@@ -1631,11 +1647,10 @@ do
 					end
 				end,
 				["OnEnter"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, st, ...)
-	--				frame.keyCapture:EnableKeyboard(true)
---DEFAULT_CHAT_FRAME:AddMessage("onEnter start")
+					--frame.keyCapture:EnableKeyboard(true)
+					--DEFAULT_CHAT_FRAME:AddMessage("onEnter start")
 					if row then
---DEFAULT_CHAT_FRAME:AddMessage("row "..row.." realrow "..realrow.." filtered row "..st.filtered[row].." filter row + offet "..st.filtered[row+st.offset])
-
+					--DEFAULT_CHAT_FRAME:AddMessage("row "..row.." realrow "..realrow.." filtered row "..st.filtered[row].." filter row + offet "..st.filtered[row+st.offset])
 						cellFrame:RegisterEvent("MODIFIER_STATE_CHANGED")
 
 						if realrow and selectedRows[data[realrow].auxData or 0] then
@@ -1652,53 +1667,36 @@ do
 							for i=1,#data do
 								selectedRows[data[i].auxData] = false
 							end
-
 							local rowStart, rowEnd = st.fencePickStart, row + st.offset
-
 							if rowStart > rowEnd then
 								rowStart, rowEnd = rowEnd, rowStart
 							end
-
 							for i=rowStart, rowEnd do
 								local r = st.filtered[i]
 								selectedRows[data[r].auxData] = true
 							end
-
 							st:Refresh()
 						else
-
 							GameTooltip:SetOwner(cellFrame, "ANCHOR_TOPLEFT")
-
 							GameTooltip:ClearLines()
-
 							GameTooltip:AddLine(columnHeaders[column].name,1,1,1,true)
-
 							local value = cellFrame.text:GetText()
-
 							local r,g,b = cellFrame.text:GetTextColor()
-
 							GameTooltip:AddLine(value,r,g,b,true)
 							GameTooltip:AddLine(cellData.tooltipText,.7,.7,.7)
-
 							GameTooltip:Show()
 						end
 					else
 						GameTooltip:SetOwner(cellFrame, "ANCHOR_TOPLEFT")
-
 						GameTooltip:ClearLines()
-
 						local value = columnHeaders[column].name
-
 						local r,g,b = 1,1,1
-
 						GameTooltip:AddLine(value,r,g,b,true)
 						GameTooltip:AddLine(columnHeaders[column].tooltipText,.7,.7,.7)
-
 						GameTooltip:Show()
 					end
-
 					return true
---DEFAULT_CHAT_FRAME:AddMessage("onEnter end")
+					--DEFAULT_CHAT_FRAME:AddMessage("onEnter end")
 				end,
 				["OnMouseDown"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, st, button, ...)
 					if row  then
@@ -1706,13 +1704,10 @@ do
 							st.fencePicking = true
 							st.fencePickStart = row + st.offset
 							local r = st.filtered[st.fencePickStart]
-
 							for i=1,#data do
 								selectedRows[data[i].auxData] = false
 							end
-
 							selectedRows[data[r].auxData] = true
-
 							st:Refresh()
 						end
 					end
@@ -1725,8 +1720,8 @@ do
 					end
 				end,
 				["OnLeave"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, st, ...)
---DEFAULT_CHAT_FRAME:AddMessage("onLeave start")
-	--				frame.keyCapture:EnableKeyboard(false)
+					--DEFAULT_CHAT_FRAME:AddMessage("onLeave start")
+					--frame.keyCapture:EnableKeyboard(false)
 					cellFrame:UnregisterEvent("MODIFIER_STATE_CHANGED")
 
 					if row  then
@@ -1735,20 +1730,16 @@ do
 						else
 							st:SetHighLightColor(rowFrame,highlightOff)
 						end
-
 						if st.mouseOverRow == row then
 							st.mouseOverRow = nil
 						end
-
 						GameTooltip:Hide()
-
 						st:Refresh()
 					else
 						GameTooltip:Hide()
 					end
-
 					return true
---DEFAULT_CHAT_FRAME:AddMessage("onLeave end")
+					--DEFAULT_CHAT_FRAME:AddMessage("onLeave end")
 				end,
 				["OnClick"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, st, button, ...)
 					if row then
@@ -1758,9 +1749,7 @@ do
 									selectedRows[data[i].auxData] = false
 								end
 							end
-
 							selectedRows[data[realrow].auxData] = true
-
 							st:Refresh()
 						end
 					else
@@ -1774,7 +1763,6 @@ do
 				["OnDoubleClick"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, button, st, ...)
 					if row then
 						local cellData = data[realrow].cols[column]
-
 						if cellData.onclick then
 							cellData.onclick(button, unpack(cellData.onclickargs or {}))
 						else
@@ -1785,8 +1773,6 @@ do
 					end
 				end,
 			})
-
-
 
 			st:SetFilter(function(self, row)
 				if currentTradeskill then
@@ -1815,7 +1801,7 @@ do
 						return false
 					end
 				end
-	--DEFAULT_CHAT_FRAME:AddMessage(type(selectedLevel).." "..tostring(selectedLevel))
+				--DEFAULT_CHAT_FRAME:AddMessage(type(selectedLevel).." "..tostring(selectedLevel))
 
 				if selectedLevel and tonumber(row.cols[3].value) < selectedLevel then
 					return false
@@ -1826,7 +1812,6 @@ do
 		end
 
 		local data = st.data
-
 
 -- GUILD CRAFT INTERFACE
 --[[
@@ -1884,29 +1869,20 @@ do
 		end
 
 ]]
-
-
 		for trade, adList in pairs(YPData[serverKey]) do
 			for player, ad in pairs(adList) do
 				AddToScrollingTable(trade,player, ad)
-
 			end
 		end
 
-
-
---		st:SetData(data)
-
-
+		-- st:SetData(data)
 		st:SortData()
 		ResizeMainWindow()
 	end
 
-
 	local function CloseFrame()
 		frame:Hide()
 	end
-
 
 	local function ToggleFrame()
 		if frame:IsVisible() then
@@ -1916,8 +1892,6 @@ do
 			frame:Show()
 		end
 	end
-
-
 
 	local function GetSizingPoint(frame)
 		local x,y = GetCursorPosition()
@@ -1951,7 +1925,6 @@ do
 		return "UNKNOWN"
 	end
 
-
 	local function CreateResizableWindow(frameName,windowTitle, width, height, resizeFunction)
 		frame = CreateFrame("Frame",frameName,UIParent)
 		frame:Hide()
@@ -1960,7 +1933,7 @@ do
 
 		frame:SetResizable(true)
 		frame:SetMovable(true)
---		frame:SetUserPlaced(true)
+		-- frame:SetUserPlaced(true)
 		frame:EnableMouse(true)
 
 		if not Config.window then
@@ -1974,11 +1947,9 @@ do
 		local x, y = Config.window[frameName].x, Config.window[frameName].y
 		local width, height = Config.window[frameName].width, Config.window[frameName].height
 
-
 		frame:SetPoint("CENTER",x,y)
 		frame:SetWidth(width)
 		frame:SetHeight(height)
-
 
 		SetBetterBackdrop(frame, {
 			bgFile = "Interface\\AddOns\\GnomishYellowPages\\Art\\newFrameBackground.tga",
