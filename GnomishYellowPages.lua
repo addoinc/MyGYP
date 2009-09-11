@@ -1,6 +1,14 @@
 -- The Gnomish Yellow Pages
 -- let your stumpy little fingers do the walking
 
+GnomishYellowPages = AceLibrary("AceAddon-2.0"):new("AceEvent-2.0")
+function GnomishYellowPages:OnEnable()
+	self:RegisterEvent("UpdateTradelinks")
+end
+function GnomishYellowPages:UpdateTradelinks(data)
+	print("DATA TO UPDATE ", data)
+end
+
 local VERSION = ("$Revision: 58 $"):match("%d+")
 
 local faction = UnitFactionGroup("player")
@@ -580,7 +588,7 @@ do
 				if index <= #data then
 					if bit.band(v, b) == v then
 						DEFAULT_CHAT_FRAME:AddMessage("bit "..index.." = spell:"..data[index].." "..GetSpellLink(data[index]))
---						Config.testOut[#Config.testOut+1] = "bit "..index.." = spell:"..data[index].." ["..GetSpellInfo(data[index]).."]"
+--						-- Config.testOut[#Config.testOut+1] = "bit "..index.." = spell:"..data[index].." ["..GetSpellInfo(data[index]).."]"
 					end
 				end
 				v = v * 2
@@ -1503,11 +1511,16 @@ do
 		srchbtn:SetScript(
 			"OnClick",
 			function(button)
+				Zugslist:TriggerEvent("RequestUpdates")
 				param = srchbx:GetText()
 				linkRow = {}
 				st.data = {}
 				for trade, adList in pairs(YPData[serverKey]) do
 					for player, ad in pairs(adList) do
+						local tradeID, bitmap = string.match(ad.link, "trade:(%d+):%d+:%d+:[0-9a-fA-F]+:([A-Za-z0-9+/]+)")
+						tradeID = tonumber(tradeID)
+						-- name = GetSpellInfo(tradeID)
+						-- TradeLink:DumpSpells(Config.spellList[tradeID], bitmap)
 						i, j = string.find(string.lower(ad.message), string.lower(param))
 						if( i ~= nil and j ~= nil ) then
 							AddToScrollingTable(trade,player, ad)
