@@ -12,9 +12,12 @@
 ## X-Curse-Project-ID: gnomishyellowpages
 ## X-Curse-Repository-ID: wow/gnomishyellowpages/mainline
 
-
 LibStub\LibStub.lua
 lib-st\Core.lua
+
+Libs\AceLibrary\AceLibrary.lua
+Libs\AceOO-2.0\AceOO-2.0.lua
+Libs\AceEvent-2.0\AceEvent-2.0.lua
 
 GYPSpellData.lua
 GnomishYellowPages.lua
