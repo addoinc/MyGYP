@@ -1,14 +1,6 @@
 -- The Gnomish Yellow Pages
 -- let your stumpy little fingers do the walking
 
-GnomishYellowPages = AceLibrary("AceAddon-2.0"):new("AceEvent-2.0")
-function GnomishYellowPages:OnEnable()
-	self:RegisterEvent("UpdateTradelinks")
-end
-function GnomishYellowPages:UpdateTradelinks(data)
-	print("DATA TO UPDATE ", data)
-end
-
 local VERSION = ("$Revision: 58 $"):match("%d+")
 
 local faction = UnitFactionGroup("player")
@@ -19,6 +11,33 @@ local player = UnitName("player")
 local playerGUID
 
 local BlizzardSendWho
+
+GnomishYellowPages = AceLibrary("AceAddon-2.0"):new("AceEvent-2.0")
+function GnomishYellowPages:OnEnable()
+	self:RegisterEvent("UpdateTradelinks")
+end
+function GnomishYellowPages:UpdateTradelinks(data)
+	if( data ~= nil ) then
+		-- for each trade in data corresponding to the current serverKey
+		for trade, adsList in pairs( data[serverKey] ) do
+			-- get the ad for each of the players
+			for player, ad in pairs(adsList) do
+				-- check if corresponding entry in YPData is present
+				if( YPData[serverKey][trade] == nil ) then
+					-- YPData didnt have the corresponding tradeslot
+					YPData[serverKey][trade] = data[serverKey][trade]
+				elseif( YPData[serverKey][trade][player] == nil ) then
+					-- YPData didnt have the corresponding player's entry
+					YPData[serverKey][trade][player] = data[serverKey][trade][player]
+				elseif( YPData[serverKey][trade][player].time < data[serverKey][trade][player].time ) then
+					-- YPData had the entry for the given player but the ad in YPData was older than the ad in data
+					YPData[serverKey][trade][player] = {}
+					YPData[serverKey][trade][player] = data[serverKey][trade][player]
+				end
+			end
+		end
+	end
+end
 
 local function OpenTradeLink(tradeString)
 --	ShowUIPanel(ItemRefTooltip)
@@ -212,7 +231,7 @@ do
 
 		for i=1,#args,2 do
 			if not frame.buttons[i] then
-				local b = CreateFrame("Button",nil,frame)
+			 	local b = CreateFrame("Button",nil,frame)
 				b:SetPoint("CENTER",buttonPosition, -35)
 				b:SetBackdrop(buttonBackdrop)
 				b:SetBackdropColor(0,0,0,1)
@@ -575,6 +594,30 @@ do
 		return R
 	end
 
+	function TradeLink:GetSpellsList(data, bitmap)
+		local index = 1
+		local spells_list = {}
+
+		if( data ~= nil ) then
+			for i=1, string.len(bitmap) do
+				local b = decodedByte[string.byte(bitmap, i)]
+				local v = 1
+
+				for j=1,6 do 
+					if index <= #data then
+						if bit.band(v, b) == v then
+							DEFAULT_CHAT_FRAME:AddMessage("bit "..index.." = spell:"..data[index].." "..GetSpellLink(data[index]))
+							local spell_name = GetSpellInfo(data[index])
+							table.insert(spells_list, spell_name)
+						end
+					end
+					v = v * 2
+					index = index + 1
+				end
+			end
+		end
+		return spells_list
+	end
 
 	function TradeLink:DumpSpells(data, bitmap)
 		local index = 1
@@ -584,7 +627,7 @@ do
 			local b = decodedByte[string.byte(bitmap, i)]
 			local v = 1
 
-			for j=1,6 do
+			for j=1,6 do 
 				if index <= #data then
 					if bit.band(v, b) == v then
 						DEFAULT_CHAT_FRAME:AddMessage("bit "..index.." = spell:"..data[index].." "..GetSpellLink(data[index]))
@@ -1511,19 +1554,30 @@ do
 		srchbtn:SetScript(
 			"OnClick",
 			function(button)
-				Zugslist:TriggerEvent("RequestUpdates")
 				param = srchbx:GetText()
 				linkRow = {}
 				st.data = {}
+				
 				for trade, adList in pairs(YPData[serverKey]) do
 					for player, ad in pairs(adList) do
+
 						local tradeID, bitmap = string.match(ad.link, "trade:(%d+):%d+:%d+:[0-9a-fA-F]+:([A-Za-z0-9+/]+)")
 						tradeID = tonumber(tradeID)
-						-- name = GetSpellInfo(tradeID)
-						-- TradeLink:DumpSpells(Config.spellList[tradeID], bitmap)
-						i, j = string.find(string.lower(ad.message), string.lower(param))
-						if( i ~= nil and j ~= nil ) then
-							AddToScrollingTable(trade,player, ad)
+						local spells_list = TradeLink:GetSpellsList(Config.spellList[tradeID], bitmap)
+						for index=1, #spells_list do
+							local i ; local j
+							i, j = string.find(string.lower(spells_list[index]),  string.lower(param))
+							if( i ~= nil and j ~= nil ) then
+								AddToScrollingTable(trade,player, ad)
+							end
+						end
+
+						if( #spells_list == 0) then
+							local i ; local j
+							i, j = string.find(string.lower(ad.message), string.lower(param))
+							if( i ~= nil and j ~= nil ) then
+								AddToScrollingTable(trade,player, ad)
+							end
 						end
 					end
 				end
@@ -2615,7 +2669,6 @@ this would help cut down on data overload
 			else
 				UpdateDatabase(Config.spellList, spellList)
 			end
-
 			Config.spellList = spellList
 		end
 
@@ -2624,6 +2677,8 @@ this would help cut down on data overload
 		if not YPData then YPData = {} end
 		if not YPData[serverKey] then YPData[serverKey] = {} end
 
+		-- pull all the updates that Zugslist has to offer
+		Zugslist:TriggerEvent("RequestUpdates")
 
 		InitPlayerLocation()
 
@@ -2652,10 +2707,10 @@ this would help cut down on data overload
 
 		frame.keyCapture = CreateFrame("Frame", nil, frame)
 
---		frame.keyCapture:SetPoint("TOPLEFT",0,0)
---		frame.keyCapture:SetPoint("BOTTOMRIGHT",0,0)
---		frame.keyCapture:SetFrameLevel(frame:GetFrameLevel()+50)
---		frame.keyCapture:EnableMouse(true)
+		--frame.keyCapture:SetPoint("TOPLEFT",0,0)
+		--frame.keyCapture:SetPoint("BOTTOMRIGHT",0,0)
+		--frame.keyCapture:SetFrameLevel(frame:GetFrameLevel()+50)
+		--frame.keyCapture:EnableMouse(true)
 
 		local function keyboardEnabler(eventFrame, event, arg1, arg2)
 			if event == "MODIFIER_STATE_CHANGED" then
@@ -2750,7 +2805,7 @@ this would help cut down on data overload
 		hooksecurefunc("SetItemRef", function(s,link,button)
 			if string.find(s,"trade:") then
 				currentTradeLink = link
---DEFAULT_CHAT_FRAME:AddMessage("string = "..s);
+				--DEFAULT_CHAT_FRAME:AddMessage("string = "..s);
 			end
 		end)
 
@@ -2758,22 +2813,17 @@ this would help cut down on data overload
 
 		if Skillet then
 			local original_SkilletSetSelectedSkill = Skillet.SetSelectedSkill
-
 			function Skillet:SetSelectedSkill(skillIndex, wasClicked)
 				if skillIndex then
 					SelectTradeSkill(skillIndex)
 				end
-
 				original_SkilletSetSelectedSkill(Skillet,skillIndex, wasClicked)
 			end
 		end
-
 		local optionsPanel = CreateFrame( "Frame", "GYPConfigPanel", UIParent );
-
 		optionsPanel.name  = "Gnomish Yellow Pages"
 		optionsPanel.okay = function(self) end
 		optionsPanel.cancel = function(self) end
-
 		InterfaceOptions_AddCategory(optionsPanel);
 
 		local function WhoTimerAdjustment()
@@ -2865,4 +2915,3 @@ this would help cut down on data overload
 	master:SetScript("OnEvent", ParseEvent)
 	master:SetScript("OnUpdate", UpdateHandler)
 end
-
