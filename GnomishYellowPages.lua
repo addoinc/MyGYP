@@ -47,7 +47,8 @@ local function OpenTradeLink(tradeString)
 	ItemRefTooltip:SetHyperlink(tradeString)
 end
 
-local tradeList = { 2259, 2018, 7411, 4036, 45357, 25229, 2108, 3908,  2550, 3273 }
+local tradeList = { 2259, 2018, 7411, 4036, 45357, 25229, 2108, 3908,  2550, 3273, 51302, 51304, 51306, 51309, 51311, 51313, 45363, 51300, 30350, 29844, 26790, 28894, 28596, 28029, 32549 }
+-- local tradeList = { 2018, 2259, 2575, 2576, 3100, 3101, 3104, 3273, 3464, 3538, 3564, 3811, 3908, 3909, 3910, 4036, 4037, 4038, 7411, 7412, 7413, 8613, 8617, 8618, 9785, 10248, 10662, 10768, 11611, 12180, 12656, 13920, 25229, 25230, 26790, 28029, 28596, 28894, 28895, 28897, 29354, 29844, 30350, 32549, 32678, 45357, 45358, 45359, 45360, 45361, 45363, 50305, 50310, 51300, 51302, 51304, 51306, 51309, 51311, 51313 }
 local spellList = {}
 
 --[[
@@ -104,7 +105,6 @@ end
 local function SetBetterBackdrop(frame, bd)
 	if not frame.backDrop then
 		frame.backDrop = CreateFrame("Frame", nil, frame)
-
 
 		for k,i in pairs({"TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT", "LEFT", "RIGHT", "TOP", "BOTTOM"}) do
 			frame.backDrop["texture"..i] =  frame:CreateTexture(nil, "BACKGROUND")
@@ -174,7 +174,6 @@ local function SetBetterBackdrop(frame, bd)
 
 	frame.backDrop.textureBG:SetPoint("TOPLEFT", frame.backDrop, "TOPLEFT", bd.edgeSize, -bd.edgeSize)
 	frame.backDrop.textureBG:SetPoint("BOTTOMRIGHT", frame.backDrop, "BOTTOMRIGHT", -bd.edgeSize, bd.edgeSize)
-
 
 	frame.backDrop.textureBG:SetTexCoord(0,w/bd.tileSize, 0,h/bd.tileSize)
 
@@ -323,20 +322,19 @@ do
 			spellBit = 0
 			spellList[tradeList[tradeIndex]] = {}
 
---			DEFAULT_CHAT_FRAME:AddMessage("Scanning "..GetTradeSkillLine().." "..(bitMapSize*6).." spells")
+			-- DEFAULT_CHAT_FRAME:AddMessage("Scanning "..GetTradeSkillLine().." "..(bitMapSize*6).." spells")
 			progressBar.textLeft:SetText("Scanning "..GetTradeSkillLine().." ("..(bitMapSize*6)..")")
 
-			timeToClose = 90				-- let's hope it doesn't come to that
+			timeToClose = 1				-- let's hope it doesn't come to that
 		end
 	end
 
 
 	local function OnTradeSkillClose(frame)
 		frameOpen = false
---DEFAULT_CHAT_FRAME:AddMessage("CLOSE")
+		--DEFAULT_CHAT_FRAME:AddMessage("CLOSE")
 		if bitMapSizes[tradeIndex] then
 			spellBit = spellBit + 1
-
 			if spellBit <= bitMapSizes[tradeIndex]*6 then
 				local percentComplete = spellBit/(bitMapSizes[tradeIndex]*6)
 
@@ -349,14 +347,14 @@ do
 
 				local bmap = string.rep("A", bytes) .. encodedByte[bit.lshift(1, bits)+1] .. string.rep("A", bitMapSizes[tradeIndex]-bytes-1)
 
---				bmap = string.rep("A", bytes)
+				-- bmap = string.rep("A", bytes)
 
 				local tradeString = string.format("trade:%d:%d:%d:%s:%s", tradeList[tradeIndex], 450, 450, playerGUID, bmap)
 
---				local link = "|cffffd000|H"..tradeString.."|h["..GetSpellInfo(tradeList[tradeIndex]).."]|h|r"
+				-- local link = "|cffffd000|H"..tradeString.."|h["..GetSpellInfo(tradeList[tradeIndex]).."]|h|r"
 
---DEFAULT_CHAT_FRAME:AddMessage(tradeString)
---DEFAULT_CHAT_FRAME:AddMessage(link)
+				-- DEFAULT_CHAT_FRAME:AddMessage(tradeString)
+				-- DEFAULT_CHAT_FRAME:AddMessage(link)
 
 				timeToClose = 30
 
@@ -377,7 +375,6 @@ do
 			bmap = string.rep("/", bitMapSize)
 
 			local tradeString = string.format("trade:%d:%d:%d:%s:%s", tradeList[tradeIndex], 450, 450, playerGUID, bmap)
-
 			OpenTradeLink(tradeString)
 			timeToClose = .01
 		end
@@ -386,18 +383,16 @@ do
 
 	local function OnTradeSkillUpdate(frame)
 		if not bitMapSizes[tradeIndex] then
---			bitMapSizes[tradeIndex] = bitMapSize
---			spellBit = 0
---			spellList[tradeList[tradeIndex]] = {}
+			--bitMapSizes[tradeIndex] = bitMapSize
+			--spellBit = 0
+			--spellList[tradeList[tradeIndex]] = {}
 
---			DEFAULT_CHAT_FRAME:AddMessage("Scanning "..GetTradeSkillLine().." "..(bitMapSize*6).." spells")
---			timeToClose = 30
+			--DEFAULT_CHAT_FRAME:AddMessage("Scanning "..GetTradeSkillLine().." "..(bitMapSize*6).." spells")
+			--timeToClose = 30
 		elseif spellBit > 0 then
 
 			local numSkills = GetNumTradeSkills()
-
-
---			DEFAULT_CHAT_FRAME:AddMessage("skills = "..tonumber(numSkills))
+			--DEFAULT_CHAT_FRAME:AddMessage("skills = "..tonumber(numSkills))
 
 			spellList[tradeList[tradeIndex]][spellBit] = tradeList[tradeIndex] -- placeHolder
 
@@ -407,7 +402,7 @@ do
 
 					if recipeLink then
 						local id = string.match(recipeLink,"enchant:(%d+)")
---DEFAULT_CHAT_FRAME:AddMessage(spellBit.." = "..id.."-"..recipeLink)
+						--DEFAULT_CHAT_FRAME:AddMessage(spellBit.." = "..id.."-"..recipeLink)
 						progressBar.textLeft:SetText(recipeLink)
 						spellList[tradeList[tradeIndex]][spellBit] = tonumber(id)
 					end
@@ -420,14 +415,14 @@ do
 
 
 	local function OnUpdate(frame, elapsed)
---DEFAULT_CHAT_FRAME:AddMessage("UPDATE")
---		countDown = countDown - elapsed
+		-- DEFAULT_CHAT_FRAME:AddMessage("UPDATE")
+		countDown = countDown - elapsed
 		timeToClose = timeToClose - elapsed
 
---DEFAULT_CHAT_FRAME:AddMessage("countDown = "..countDown)
---		if countDown < 0 then
---			OnTradeSkillClose()
---		end
+		-- DEFAULT_CHAT_FRAME:AddMessage("countDown = "..countDown)
+		-- if countDown < 0 then
+		--	OnTradeSkillClose()
+		-- end
 
 		if timeToClose < 0 then
 			timeToClose = 1000
@@ -499,13 +494,12 @@ do
 
 		local scanFrame = CreateFrame("Frame")
 
-
 		scanFrame:RegisterEvent("TRADE_SKILL_SHOW")
 		scanFrame:RegisterEvent("TRADE_SKILL_UPDATE")
 		scanFrame:RegisterEvent("TRADE_SKILL_CLOSE")
 
 		scanFrame:SetScript("OnEvent", function(frame,event)
---DEFAULT_CHAT_FRAME:AddMessage(tostring(event))
+			-- DEFAULT_CHAT_FRAME:AddMessage(tostring(event))
 			if event == "TRADE_SKILL_SHOW" then
 				OnTradeSkillShow(frame)
 			end
@@ -520,10 +514,8 @@ do
 		end)
 
 		scanFrame:SetScript("OnUpdate", OnUpdate)
-
 		OnTradeSkillClose()
 	end
-
 
 	function TradeLink:BitmapEncode(data, mask)
 		local v = 0
@@ -606,7 +598,7 @@ do
 				for j=1,6 do 
 					if index <= #data then
 						if bit.band(v, b) == v then
-							DEFAULT_CHAT_FRAME:AddMessage("bit "..index.." = spell:"..data[index].." "..GetSpellLink(data[index]))
+							-- DEFAULT_CHAT_FRAME:AddMessage("bit "..index.." = spell:"..data[index].." "..GetSpellLink(data[index]))
 							local spell_name = GetSpellInfo(data[index])
 							table.insert(spells_list, spell_name)
 						end
@@ -621,7 +613,7 @@ do
 
 	function TradeLink:DumpSpells(data, bitmap)
 		local index = 1
---		Config.testOut = {}
+		-- Config.testOut = {}
 
 		for i=1, string.len(bitmap) do
 			local b = decodedByte[string.byte(bitmap, i)]
@@ -630,12 +622,11 @@ do
 			for j=1,6 do 
 				if index <= #data then
 					if bit.band(v, b) == v then
-						DEFAULT_CHAT_FRAME:AddMessage("bit "..index.." = spell:"..data[index].." "..GetSpellLink(data[index]))
---						-- Config.testOut[#Config.testOut+1] = "bit "..index.." = spell:"..data[index].." ["..GetSpellInfo(data[index]).."]"
+						-- DEFAULT_CHAT_FRAME:AddMessage("bit "..index.." = spell:"..data[index].." "..GetSpellLink(data[index]))
+						-- Config.testOut[#Config.testOut+1] = "bit "..index.." = spell:"..data[index].." ["..GetSpellInfo(data[index]).."]"
 					end
 				end
 				v = v * 2
-
 				index = index + 1
 			end
 		end
@@ -678,16 +669,14 @@ do
 		return compressed
 	end
 
-
-
--- the following only operate on COMPRESSED bitmaps
+	-- the following only operate on COMPRESSED bitmaps
 	function TradeLink:BitsShared(b1, b2)
 		local sharedBits = 0
 		local len = math.min(#b1,#b2)
 
 		for i=1,len do
 			result = bit.band(b1[i],b2[i] or 0)
---DEFAULT_CHAT_FRAME:AddMessage(tostring(b1[i]).." "..tostring(b2[i]).." result "..result)
+			--DEFAULT_CHAT_FRAME:AddMessage(tostring(b1[i]).." "..tostring(b2[i]).." result "..result)
 
 			if result~=0 then
 				for b=0,29 do
@@ -697,7 +686,7 @@ do
 				end
 			end
 		end
---DEFAULT_CHAT_FRAME:AddMessage("shared "..sharedBits)
+		--DEFAULT_CHAT_FRAME:AddMessage("shared "..sharedBits)
 		return sharedBits
 	end
 
@@ -876,7 +865,7 @@ do
 
 	local function ParseEvent(frame, event, ...)
 		if frame.events[event] then
---		DEFAULT_CHAT_FRAME:AddMessage(event)
+		--DEFAULT_CHAT_FRAME:AddMessage(event)
 			frame.events[event](...)
 		end
 	end
@@ -922,7 +911,7 @@ do
 				local who = table.remove(priorityWho, 1)
 
 				BlizzardSendWho(who)
---DEFAULT_CHAT_FRAME:AddMessage("priority "..who.." "..elapsed)
+				--DEFAULT_CHAT_FRAME:AddMessage("priority "..who.." "..elapsed)
 			elseif #backgroundWho > 0 then
 
 				local who = table.remove(backgroundWho, 1)
@@ -930,7 +919,7 @@ do
 				whoDataPending = true
 				SetWhoToUI(1)
 				BlizzardSendWho(who)
---DEFAULT_CHAT_FRAME:AddMessage("background "..who.." "..elapsed)
+				--DEFAULT_CHAT_FRAME:AddMessage("background "..who.." "..elapsed)
 			end
 		end
 	end
