@@ -1,4 +1,4 @@
-## Interface: 30200
+## Interface: 30300
 ## Title: Gnomish Yellow Pages
 ## Notes: Captures chatframe Tradeskill Links for later reference in an easy to read format
 ## Author: LilSparky
@@ -17,6 +17,7 @@ lib-st\Core.lua
 
 Libs\AceLibrary\AceLibrary.lua
 Libs\AceOO-2.0\AceOO-2.0.lua
+Libs\AceAddon-2.0\AceAddon-2.0.lua
 Libs\AceEvent-2.0\AceEvent-2.0.lua
 
 GYPSpellData.lua

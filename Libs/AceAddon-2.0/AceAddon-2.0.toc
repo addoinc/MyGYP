@@ -4,7 +4,7 @@
 ## X-Curse-Project-ID: ace2
 ## X-Curse-Repository-ID: wow/ace2/mainline
 
-## Title: Lib: AceEvent-2.0
+## Title: Lib: AceAddon-2.0
 ## Notes: AddOn development framework
 ## Author: Ace Development Team
 ## LoadOnDemand: 1
@@ -13,4 +13,4 @@
 ## X-License: LGPL v2.1 + MIT for AceOO-2.0
 ## Dependencies: AceLibrary, AceOO-2.0
  
-AceEvent-2.0.lua
+AceAddon-2.0.lua
